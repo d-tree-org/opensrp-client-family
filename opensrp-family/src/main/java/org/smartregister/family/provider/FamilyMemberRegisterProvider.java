@@ -267,6 +267,7 @@ public class FamilyMemberRegisterProvider implements RecyclerViewProvider<Family
     public class RegisterViewHolder extends RecyclerView.ViewHolder {
         public ImageView status;
         public ImageView profile;
+        public ImageView fingerprintStatus;
         public CustomFontTextView patientNameAge;
         public TextView gender;
         public TextView familyHead;
@@ -283,6 +284,7 @@ public class FamilyMemberRegisterProvider implements RecyclerViewProvider<Family
 
             status = itemView.findViewById(R.id.status);
             profile = itemView.findViewById(R.id.profile);
+            fingerprintStatus = itemView.findViewById(R.id.finger_print_status);
 
             patientNameAge = itemView.findViewById(R.id.patient_name_age);
             gender = itemView.findViewById(R.id.gender);
