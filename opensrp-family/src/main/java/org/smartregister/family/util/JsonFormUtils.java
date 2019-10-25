@@ -532,7 +532,7 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
             allLevels.add("Region");
             allLevels.add("Village");
             allLevels.add("Ward");
-            allLevels.add("MOH Jhpiego Facility Name");
+            allLevels.add("Facility Name");
 
             ArrayList<String> healthFacilities = new ArrayList<>();
             healthFacilities.add("Country");
@@ -540,7 +540,7 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
             healthFacilities.add("Region");
             healthFacilities.add("Village");
             healthFacilities.add("Ward");
-            healthFacilities.add("MOH Jhpiego Facility Name");
+            healthFacilities.add("Facility Name");
 
             List<String> defaultFacility = LocationHelper.getInstance().generateDefaultLocationHierarchy(healthFacilities);
 
