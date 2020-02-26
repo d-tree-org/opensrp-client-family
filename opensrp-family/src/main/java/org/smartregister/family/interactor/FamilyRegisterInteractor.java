@@ -76,11 +76,11 @@ public class FamilyRegisterInteractor implements FamilyRegisterContract.Interact
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                saveRegistration(familyEventClientList, jsonString, isEditMode);
+                final boolean isSaved = saveRegistration(familyEventClientList, jsonString, isEditMode);
                 appExecutors.mainThread().execute(new Runnable() {
                     @Override
                     public void run() {
-                        callBack.onRegistrationSaved(isEditMode);
+                        callBack.onRegistrationSaved(isEditMode, isSaved, familyEventClientList);
                     }
                 });
             }
@@ -101,7 +101,7 @@ public class FamilyRegisterInteractor implements FamilyRegisterContract.Interact
         appExecutors.diskIO().execute(runnable);
     }
 
-    private void saveRegistration(List<FamilyEventClient> familyEventClientList, String jsonString, boolean isEditMode) {
+    private boolean saveRegistration(List<FamilyEventClient> familyEventClientList, String jsonString, boolean isEditMode) {
 
         try {
 
@@ -151,9 +151,18 @@ public class FamilyRegisterInteractor implements FamilyRegisterContract.Interact
                 if (baseClient != null || baseEvent != null) {
                     String imageLocation = null;
                     if (i == 0) {
-                        imageLocation = JsonFormUtils.getFieldValue(jsonString, Constants.KEY.PHOTO);
+                        String familyStep = Utils.getCustomConfigs(Constants.CustomConfig.FAMILY_FORM_IMAGE_STEP);
+
+                        imageLocation = (StringUtils.isBlank(familyStep)) ?
+                                JsonFormUtils.getFieldValue(jsonString, Constants.KEY.PHOTO) :
+                                JsonFormUtils.getFieldValue(jsonString, familyStep, Constants.KEY.PHOTO);
+
                     } else if (i == 1) {
-                        imageLocation = JsonFormUtils.getFieldValue(jsonString, JsonFormUtils.STEP2, Constants.KEY.PHOTO);
+                        String familyMemberStep = Utils.getCustomConfigs(Constants.CustomConfig.FAMILY_MEMBER_FORM_IMAGE_STEP);
+
+                        imageLocation = (StringUtils.isBlank(familyMemberStep)) ?
+                                JsonFormUtils.getFieldValue(jsonString, JsonFormUtils.STEP2, Constants.KEY.PHOTO) :
+                                JsonFormUtils.getFieldValue(jsonString, familyMemberStep, Constants.KEY.PHOTO);
                     }
 
                     if (StringUtils.isNotBlank(imageLocation)) {
@@ -170,12 +179,14 @@ public class FamilyRegisterInteractor implements FamilyRegisterContract.Interact
 
             processClient(eventClientList);
             getAllSharedPreferences().saveLastUpdatedAtDate(lastSyncDate.getTime());
+            return true;
         } catch (Exception e) {
             Timber.e(e);
+            return false;
         }
     }
 
-    protected  void processClient(List<EventClient> eventClientList) {
+    protected void processClient(List<EventClient> eventClientList) {
         try {
             getClientProcessorForJava().processClient(eventClientList);
         } catch (Exception e) {
