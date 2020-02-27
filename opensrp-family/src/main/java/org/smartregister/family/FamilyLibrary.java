@@ -2,6 +2,7 @@ package org.smartregister.family;
 
 import org.smartregister.Context;
 import org.smartregister.CoreLibrary;
+import org.smartregister.commonregistry.AllCommonsRepository;
 import org.smartregister.family.domain.FamilyMetadata;
 import org.smartregister.repository.Repository;
 import org.smartregister.repository.UniqueIdRepository;
@@ -28,6 +29,8 @@ public class FamilyLibrary {
 
     private ClientProcessorForJava clientProcessorForJava;
     private Compressor compressor;
+
+    private AllCommonsRepository allCommonsRepository;
 
     public static void init(Context context, FamilyMetadata familyMetadata, int applicationVersion, int databaseVersion) {
         if (instance == null) {
@@ -78,6 +81,13 @@ public class FamilyLibrary {
             uniqueIdRepository = new UniqueIdRepository();
         }
         return uniqueIdRepository;
+    }
+
+    public AllCommonsRepository getAllCommonsRepository(String tableName){
+        if (allCommonsRepository == null){
+            allCommonsRepository = Context.getInstance().allCommonsRepositoryobjects(tableName);
+        }
+        return allCommonsRepository;
     }
 
     public ECSyncHelper getEcSyncHelper() {
