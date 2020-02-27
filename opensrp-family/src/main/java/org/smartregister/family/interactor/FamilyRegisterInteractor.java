@@ -135,7 +135,7 @@ public class FamilyRegisterInteractor implements FamilyRegisterContract.Interact
 
                     String tableName = Utils.metadata().familyRegister.tableName;
 
-                    if (consent){
+                    if (!consent){
                         Date date_removed = new Date();
                         AllCommonsRepository commonsRepository = FamilyLibrary.getInstance().getAllCommonsRepository(tableName);
                         if (commonsRepository != null) {
