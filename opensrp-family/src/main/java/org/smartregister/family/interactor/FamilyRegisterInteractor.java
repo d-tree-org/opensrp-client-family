@@ -1,5 +1,7 @@
 package org.smartregister.family.interactor;
 
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.VisibleForTesting;
 
 import org.apache.commons.lang3.StringUtils;
@@ -7,6 +9,8 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.json.JSONObject;
 import org.smartregister.clientandeventmodel.Client;
 import org.smartregister.clientandeventmodel.Event;
+import org.smartregister.commonregistry.AllCommonsRepository;
+import org.smartregister.commonregistry.CommonRepository;
 import org.smartregister.domain.UniqueId;
 import org.smartregister.domain.db.EventClient;
 import org.smartregister.family.FamilyLibrary;
@@ -14,13 +18,18 @@ import org.smartregister.family.contract.FamilyRegisterContract;
 import org.smartregister.family.domain.FamilyEventClient;
 import org.smartregister.family.util.AppExecutors;
 import org.smartregister.family.util.Constants;
+import org.smartregister.family.util.DBConstants;
 import org.smartregister.family.util.JsonFormUtils;
 import org.smartregister.family.util.Utils;
 import org.smartregister.repository.AllSharedPreferences;
+import org.smartregister.repository.DrishtiRepository;
+import org.smartregister.repository.Repository;
 import org.smartregister.repository.UniqueIdRepository;
 import org.smartregister.sync.ClientProcessorForJava;
 import org.smartregister.sync.helper.ECSyncHelper;
+import org.smartregister.view.activity.DrishtiApplication;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -106,6 +115,9 @@ public class FamilyRegisterInteractor implements FamilyRegisterContract.Interact
         try {
 
             List<EventClient> eventClientList = new ArrayList<>();
+
+            boolean consent = JsonFormUtils.getConsentValueFromJson(jsonString);
+
             for (int i = 0; i < familyEventClientList.size(); i++) {
                 FamilyEventClient familyEventClient = familyEventClientList.get(i);
                 Client baseClient = familyEventClient.getClient();
@@ -120,6 +132,21 @@ public class FamilyRegisterInteractor implements FamilyRegisterContract.Interact
                     } else {
                         getSyncHelper().addClient(baseClient.getBaseEntityId(), clientJson);
                     }
+
+                    String tableName = Utils.metadata().familyRegister.tableName;
+
+                    if (consent){
+                        Date date_removed = new Date();
+                        AllCommonsRepository commonsRepository = FamilyLibrary.getInstance().getAllCommonsRepository(tableName);
+                        if (commonsRepository != null) {
+                            ContentValues values = new ContentValues();
+                            values.put(DBConstants.KEY.DATE_REMOVED, new SimpleDateFormat("yyyy-MM-dd").format(date_removed));
+                            commonsRepository.update(tableName, values, baseClient.getBaseEntityId());
+                            commonsRepository.updateSearch(baseClient.getBaseEntityId());
+                            commonsRepository.close(baseClient.getBaseEntityId());
+                        }
+                    }
+
                 }
 
                 if (baseEvent != null) {
@@ -206,7 +233,6 @@ public class FamilyRegisterInteractor implements FamilyRegisterContract.Interact
     public UniqueIdRepository getUniqueIdRepository() {
         return FamilyLibrary.getInstance().getUniqueIdRepository();
     }
-
 
     public ECSyncHelper getSyncHelper() {
         return FamilyLibrary.getInstance().getEcSyncHelper();
