@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.util.Pair;
 
 import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 
 import org.apache.commons.lang3.StringUtils;
@@ -529,6 +530,19 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
 
         return getFieldValue(fields, key);
 
+    }
+
+
+    public static boolean getConsentValueFromJson(String jsonString){
+
+        boolean familyConsents = false;
+
+        String fieldValue = getFieldValue(jsonString, STEP2, "fam_consent");
+        if (fieldValue != null && fieldValue.contains("chk_consent_yes")){
+            familyConsents = true;
+        }
+
+        return familyConsents;
     }
 
     /**
