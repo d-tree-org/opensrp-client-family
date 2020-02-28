@@ -1,5 +1,7 @@
 package org.smartregister.family.interactor;
 
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.VisibleForTesting;
 
 import org.apache.commons.lang3.StringUtils;
@@ -7,6 +9,8 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.json.JSONObject;
 import org.smartregister.clientandeventmodel.Client;
 import org.smartregister.clientandeventmodel.Event;
+import org.smartregister.commonregistry.AllCommonsRepository;
+import org.smartregister.commonregistry.CommonRepository;
 import org.smartregister.domain.UniqueId;
 import org.smartregister.domain.db.EventClient;
 import org.smartregister.family.FamilyLibrary;
@@ -14,13 +18,18 @@ import org.smartregister.family.contract.FamilyRegisterContract;
 import org.smartregister.family.domain.FamilyEventClient;
 import org.smartregister.family.util.AppExecutors;
 import org.smartregister.family.util.Constants;
+import org.smartregister.family.util.DBConstants;
 import org.smartregister.family.util.JsonFormUtils;
 import org.smartregister.family.util.Utils;
 import org.smartregister.repository.AllSharedPreferences;
+import org.smartregister.repository.DrishtiRepository;
+import org.smartregister.repository.Repository;
 import org.smartregister.repository.UniqueIdRepository;
 import org.smartregister.sync.ClientProcessorForJava;
 import org.smartregister.sync.helper.ECSyncHelper;
+import org.smartregister.view.activity.DrishtiApplication;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -76,11 +85,11 @@ public class FamilyRegisterInteractor implements FamilyRegisterContract.Interact
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                saveRegistration(familyEventClientList, jsonString, isEditMode);
+                final boolean isSaved = saveRegistration(familyEventClientList, jsonString, isEditMode);
                 appExecutors.mainThread().execute(new Runnable() {
                     @Override
                     public void run() {
-                        callBack.onRegistrationSaved(isEditMode);
+                        callBack.onRegistrationSaved(isEditMode, isSaved, familyEventClientList);
                     }
                 });
             }
@@ -101,11 +110,14 @@ public class FamilyRegisterInteractor implements FamilyRegisterContract.Interact
         appExecutors.diskIO().execute(runnable);
     }
 
-    private void saveRegistration(List<FamilyEventClient> familyEventClientList, String jsonString, boolean isEditMode) {
+    private boolean saveRegistration(List<FamilyEventClient> familyEventClientList, String jsonString, boolean isEditMode) {
 
         try {
 
+            boolean consent = JsonFormUtils.getConsentValueFromJson(jsonString);
+
             List<EventClient> eventClientList = new ArrayList<>();
+
             for (int i = 0; i < familyEventClientList.size(); i++) {
                 FamilyEventClient familyEventClient = familyEventClientList.get(i);
                 Client baseClient = familyEventClient.getClient();
@@ -114,12 +126,19 @@ public class FamilyRegisterInteractor implements FamilyRegisterContract.Interact
                 JSONObject clientJson = null;
 
                 if (baseClient != null) {
+                    // Check if consent was received, if not set the date removed value
+                    if (!consent){
+                        Date today = new Date();
+                        baseClient.addAttribute("dateRemoved", today.toString());
+                    }
                     clientJson = new JSONObject(JsonFormUtils.gson.toJson(baseClient));
+
                     if (isEditMode) {
                         JsonFormUtils.mergeAndSaveClient(getSyncHelper(), baseClient);
                     } else {
                         getSyncHelper().addClient(baseClient.getBaseEntityId(), clientJson);
                     }
+
                 }
 
                 if (baseEvent != null) {
@@ -151,9 +170,18 @@ public class FamilyRegisterInteractor implements FamilyRegisterContract.Interact
                 if (baseClient != null || baseEvent != null) {
                     String imageLocation = null;
                     if (i == 0) {
-                        imageLocation = JsonFormUtils.getFieldValue(jsonString, Constants.KEY.PHOTO);
+                        String familyStep = Utils.getCustomConfigs(Constants.CustomConfig.FAMILY_FORM_IMAGE_STEP);
+
+                        imageLocation = (StringUtils.isBlank(familyStep)) ?
+                                JsonFormUtils.getFieldValue(jsonString, Constants.KEY.PHOTO) :
+                                JsonFormUtils.getFieldValue(jsonString, familyStep, Constants.KEY.PHOTO);
+
                     } else if (i == 1) {
-                        imageLocation = JsonFormUtils.getFieldValue(jsonString, JsonFormUtils.STEP2, Constants.KEY.PHOTO);
+                        String familyMemberStep = Utils.getCustomConfigs(Constants.CustomConfig.FAMILY_MEMBER_FORM_IMAGE_STEP);
+
+                        imageLocation = (StringUtils.isBlank(familyMemberStep)) ?
+                                JsonFormUtils.getFieldValue(jsonString, JsonFormUtils.STEP3, Constants.KEY.PHOTO) :
+                                JsonFormUtils.getFieldValue(jsonString, familyMemberStep, Constants.KEY.PHOTO);
                     }
 
                     if (StringUtils.isNotBlank(imageLocation)) {
@@ -170,12 +198,15 @@ public class FamilyRegisterInteractor implements FamilyRegisterContract.Interact
 
             processClient(eventClientList);
             getAllSharedPreferences().saveLastUpdatedAtDate(lastSyncDate.getTime());
+
+            return true;
         } catch (Exception e) {
             Timber.e(e);
+            return false;
         }
     }
 
-    protected  void processClient(List<EventClient> eventClientList) {
+    protected void processClient(List<EventClient> eventClientList) {
         try {
             getClientProcessorForJava().processClient(eventClientList);
         } catch (Exception e) {
@@ -195,7 +226,6 @@ public class FamilyRegisterInteractor implements FamilyRegisterContract.Interact
     public UniqueIdRepository getUniqueIdRepository() {
         return FamilyLibrary.getInstance().getUniqueIdRepository();
     }
-
 
     public ECSyncHelper getSyncHelper() {
         return FamilyLibrary.getInstance().getEcSyncHelper();

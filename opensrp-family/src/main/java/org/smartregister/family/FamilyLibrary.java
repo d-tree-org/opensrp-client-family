@@ -2,6 +2,7 @@ package org.smartregister.family;
 
 import org.smartregister.Context;
 import org.smartregister.CoreLibrary;
+import org.smartregister.commonregistry.AllCommonsRepository;
 import org.smartregister.family.domain.FamilyMetadata;
 import org.smartregister.repository.Repository;
 import org.smartregister.repository.UniqueIdRepository;
@@ -18,7 +19,6 @@ public class FamilyLibrary {
     private static FamilyLibrary instance;
 
     private final Context context;
-    private final Repository repository;
     private FamilyMetadata metadata;
 
     private int applicationVersion;
@@ -30,9 +30,11 @@ public class FamilyLibrary {
     private ClientProcessorForJava clientProcessorForJava;
     private Compressor compressor;
 
-    public static void init(Context context, Repository repository, FamilyMetadata familyMetadata, int applicationVersion, int databaseVersion) {
+    private AllCommonsRepository allCommonsRepository;
+
+    public static void init(Context context, FamilyMetadata familyMetadata, int applicationVersion, int databaseVersion) {
         if (instance == null) {
-            instance = new FamilyLibrary(context, repository, familyMetadata, applicationVersion, databaseVersion);
+            instance = new FamilyLibrary(context, familyMetadata, applicationVersion, databaseVersion);
         }
     }
 
@@ -46,9 +48,8 @@ public class FamilyLibrary {
         return instance;
     }
 
-    private FamilyLibrary(Context contextArg, Repository repositoryArg, FamilyMetadata metadataArg, int applicationVersion, int databaseVersion) {
+    private FamilyLibrary(Context contextArg, FamilyMetadata metadataArg, int applicationVersion, int databaseVersion) {
         this.context = contextArg;
-        this.repository = repositoryArg;
         this.metadata = metadataArg;
         this.applicationVersion = applicationVersion;
         this.databaseVersion = databaseVersion;
@@ -62,9 +63,6 @@ public class FamilyLibrary {
         return context;
     }
 
-    public Repository getRepository() {
-        return repository;
-    }
 
     public FamilyMetadata metadata() {
         return metadata;
@@ -80,9 +78,16 @@ public class FamilyLibrary {
 
     public UniqueIdRepository getUniqueIdRepository() {
         if (uniqueIdRepository == null) {
-            uniqueIdRepository = new UniqueIdRepository(getRepository());
+            uniqueIdRepository = new UniqueIdRepository();
         }
         return uniqueIdRepository;
+    }
+
+    public AllCommonsRepository getAllCommonsRepository(String tableName){
+        if (allCommonsRepository == null){
+            allCommonsRepository = Context.getInstance().allCommonsRepositoryobjects(tableName);
+        }
+        return allCommonsRepository;
     }
 
     public ECSyncHelper getEcSyncHelper() {
@@ -113,13 +118,13 @@ public class FamilyLibrary {
 
     /**
      * Use this method when testing.
-     * It should replace org.smartregister.Context#setInstance(org.smartregister.Context, org.smartregister.repository.Repository) which has been removed
+     * It should replace org.smartregister.Context#setInstance(org.smartregister.Context) which has been removed
      *
      * @param context
      */
-    public static void reset(Context context, Repository repository, FamilyMetadata metadata, int applicationVersion, int databaseVersion) {
+    public static void reset(Context context, FamilyMetadata metadata, int applicationVersion, int databaseVersion) {
         if (context != null) {
-            instance = new FamilyLibrary(context, repository, metadata, applicationVersion, databaseVersion);
+            instance = new FamilyLibrary(context, metadata, applicationVersion, databaseVersion);
         }
     }
 
