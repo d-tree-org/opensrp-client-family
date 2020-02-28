@@ -61,6 +61,8 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
 
     public static final String STEP2 = "step2";
 
+    public static final String STEP3 = "step3";
+
     public static final String RELATIONSHIPS = "relationships";
 
     public static JSONObject getFormAsJson(JSONObject form,
@@ -88,7 +90,7 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
                 }
 
                 // Inject opensrp id into the form
-                field = fields(form, STEP2);
+                field = fields(form, STEP3); //Changed to step3 for the consent form is now in step2
                 uniqueId = getFieldJSONObject(field, Constants.JSON_FORM_KEY.UNIQUE_ID);
                 if (uniqueId != null) {
                     uniqueId.remove(JsonFormUtils.VALUE);
@@ -171,7 +173,7 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
 
             String familyStep = Utils.getCustomConfigs(Constants.CustomConfig.FAMILY_MEMBER_FORM_IMAGE_STEP);
             Triple<Boolean, JSONObject, JSONArray> registrationFormParams = (StringUtils.isBlank(familyStep)) ?
-                    validateParameters(jsonString, STEP2) : validateParameters(jsonString, familyStep);
+                    validateParameters(jsonString, STEP3) : validateParameters(jsonString, familyStep); //TODO :: STEP3 CHANGE
 
             if (!registrationFormParams.getLeft()) {
                 return null;
