@@ -114,9 +114,9 @@ public class FamilyRegisterInteractor implements FamilyRegisterContract.Interact
 
         try {
 
-            List<EventClient> eventClientList = new ArrayList<>();
-
             boolean consent = JsonFormUtils.getConsentValueFromJson(jsonString);
+
+            List<EventClient> eventClientList = new ArrayList<>();
 
             for (int i = 0; i < familyEventClientList.size(); i++) {
                 FamilyEventClient familyEventClient = familyEventClientList.get(i);
@@ -126,25 +126,17 @@ public class FamilyRegisterInteractor implements FamilyRegisterContract.Interact
                 JSONObject clientJson = null;
 
                 if (baseClient != null) {
+                    // Check if consent was received, if not set the date removed value
+                    if (!consent){
+                        Date today = new Date();
+                        baseClient.addAttribute("dateRemoved", today.toString());
+                    }
                     clientJson = new JSONObject(JsonFormUtils.gson.toJson(baseClient));
+
                     if (isEditMode) {
                         JsonFormUtils.mergeAndSaveClient(getSyncHelper(), baseClient);
                     } else {
                         getSyncHelper().addClient(baseClient.getBaseEntityId(), clientJson);
-                    }
-
-                    String tableName = Utils.metadata().familyRegister.tableName;
-
-                    if (!consent){
-                        Date date_removed = new Date();
-                        AllCommonsRepository commonsRepository = FamilyLibrary.getInstance().getAllCommonsRepository(tableName);
-                        if (commonsRepository != null) {
-                            ContentValues values = new ContentValues();
-                            values.put(DBConstants.KEY.DATE_REMOVED, new SimpleDateFormat("yyyy-MM-dd").format(date_removed));
-                            commonsRepository.update(tableName, values, baseClient.getBaseEntityId());
-                            commonsRepository.updateSearch(baseClient.getBaseEntityId());
-                            commonsRepository.close(baseClient.getBaseEntityId());
-                        }
                     }
 
                 }
@@ -188,7 +180,7 @@ public class FamilyRegisterInteractor implements FamilyRegisterContract.Interact
                         String familyMemberStep = Utils.getCustomConfigs(Constants.CustomConfig.FAMILY_MEMBER_FORM_IMAGE_STEP);
 
                         imageLocation = (StringUtils.isBlank(familyMemberStep)) ?
-                                JsonFormUtils.getFieldValue(jsonString, JsonFormUtils.STEP2, Constants.KEY.PHOTO) :
+                                JsonFormUtils.getFieldValue(jsonString, JsonFormUtils.STEP3, Constants.KEY.PHOTO) :
                                 JsonFormUtils.getFieldValue(jsonString, familyMemberStep, Constants.KEY.PHOTO);
                     }
 
@@ -206,6 +198,7 @@ public class FamilyRegisterInteractor implements FamilyRegisterContract.Interact
 
             processClient(eventClientList);
             getAllSharedPreferences().saveLastUpdatedAtDate(lastSyncDate.getTime());
+
             return true;
         } catch (Exception e) {
             Timber.e(e);
