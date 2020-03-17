@@ -79,7 +79,7 @@ def githubProperties = new Properties()
 githubProperties.load(new FileInputStream(rootProject.file("github.properties")))
 
 def getVersionName = { ->
-    return "1.2.35-DTREE-SNAPSHOT" // Library version
+    return "1.2.36-DTREE-SNAPSHOT" // Library version
 }
 
 def getArtificatId = { ->
@@ -154,8 +154,19 @@ allprojects {
     }
 }
 
+repositories {
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/issyzac/opensrp-client-core")
+        credentials {
+            username = githubProperties['gpr.usr'] ?: System.getenv("GPR_USER")
+            password = githubProperties['gpr.key'] ?: System.getenv("GPR_API_KEY")
+        }
+    }
+}
+
 dependencies {
-    implementation('org.smartregister:opensrp-client-core:1.8.14-SNAPSHOT@aar') {
+    implementation('org.smartregister:opensrp-client-core:1.8.27-DTREE-SNAPSHOT') {
         transitive = true
         exclude group: 'com.github.bmelnychuk', module: 'atv'
         exclude group: 'com.google.guava', module: 'guava'
