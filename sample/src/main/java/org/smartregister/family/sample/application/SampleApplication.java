@@ -1,6 +1,5 @@
 package org.smartregister.family.sample.application;
 
-import com.evernote.android.job.JobManager;
 
 import org.smartregister.Context;
 import org.smartregister.CoreLibrary;
@@ -11,7 +10,6 @@ import org.smartregister.family.activity.FamilyWizardFormActivity;
 import org.smartregister.family.domain.FamilyMetadata;
 import org.smartregister.family.sample.BuildConfig;
 import org.smartregister.family.sample.activity.FamilyProfileActivity;
-import org.smartregister.family.sample.job.SampleJobCreator;
 import org.smartregister.family.sample.repository.SampleRepository;
 import org.smartregister.family.sample.util.SampleConstants;
 import org.smartregister.family.util.DBConstants;
@@ -59,7 +57,7 @@ public class SampleApplication extends DrishtiApplication {
 
 
         //init Job Manager
-        JobManager.create(this).addJobCreator(new SampleJobCreator());
+        //JobManager.create(this).addJobCreator(new SampleJobCreator());
 
         sampleUniqueIds();
 
