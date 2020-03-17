@@ -18,7 +18,12 @@ public abstract class Constants {
         public static final String LAST_INTERACTED_WITH = "last_interacted_with";
         public static final String DOB = "dob";
         public static final String DOB_UNKNOWN = "dob_unknown";
+        public static final String VILLAGE = "fam_village";
         public static final String AGE = "age";
+
+        public static final String SIMPRINTS_MODULE_ID = "module_id";
+        public static final String SIMPRINTS_USER_ID = "user_id";
+        public static final String FINGER_PRINT = "finger_print";
 
     }
 
