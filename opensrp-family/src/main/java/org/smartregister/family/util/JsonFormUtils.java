@@ -47,6 +47,8 @@ import java.util.UUID;
 
 import timber.log.Timber;
 
+import static org.smartregister.util.Utils.getAllSharedPreferences;
+
 /**
  * Created by keyman on 13/11/2018.
  */
@@ -83,15 +85,36 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
             JSONArray field = fields(form, STEP1);
             JSONObject uniqueId = getFieldJSONObject(field, Constants.JSON_FORM_KEY.UNIQUE_ID);
 
+            JSONObject village = getFieldJSONObject(field, Constants.JSON_FORM_KEY.VILLAGE);
+
             if (formName.equals(Utils.metadata().familyRegister.formName)) {
                 if (uniqueId != null) {
                     uniqueId.remove(JsonFormUtils.VALUE);
                     uniqueId.put(JsonFormUtils.VALUE, entityId + "_Family");
                 }
 
-                // Inject opensrp id into the form
+                // Get the provider village here
+                /*
+                1. From SharedPreference
+                2. From the database
+                3. ?
+                 */
+                String username = getAllSharedPreferences().getANMPreferredName(getAllSharedPreferences().fetchRegisteredANM());
+                String providerVillage = getAllSharedPreferences().fetchUserLocalityName(username);
+
+                village.remove(JsonFormUtils.VALUE);
+                village.put(JsonFormUtils.VALUE, providerVillage);
+
+                // Inject opensrp id into the form for individual member registration
                 field = fields(form, STEP3); //Changed to step3 for the consent form is now in step2
                 uniqueId = getFieldJSONObject(field, Constants.JSON_FORM_KEY.UNIQUE_ID);
+
+                //Add the username and module id for simprints
+                JSONObject fingerprint = getFieldJSONObject(field, Constants.JSON_FORM_KEY.FINGER_PRINT);
+                fingerprint.remove(Constants.JSON_FORM_KEY.SIMPRINTS_MODULE_ID);
+                fingerprint.put(Constants.JSON_FORM_KEY.SIMPRINTS_MODULE_ID, providerVillage);
+                fingerprint.put(Constants.JSON_FORM_KEY.SIMPRINTS_USER_ID, username);
+
                 if (uniqueId != null) {
                     uniqueId.remove(JsonFormUtils.VALUE);
                     uniqueId.put(JsonFormUtils.VALUE, entityId);
