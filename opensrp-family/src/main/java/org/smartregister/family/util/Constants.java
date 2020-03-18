@@ -21,10 +21,16 @@ public abstract class Constants {
         public static final String VILLAGE = "fam_village";
         public static final String AGE = "age";
 
+        public static final String HINT = "hint";
+
         public static final String SIMPRINTS_MODULE_ID = "module_id";
         public static final String SIMPRINTS_USER_ID = "user_id";
         public static final String FINGER_PRINT = "finger_print";
 
+    }
+
+    public static class VILLAGE {
+        public static final String HINT = "hint";
     }
 
     public static class JSON_FORM_EXTRA {

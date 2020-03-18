@@ -104,6 +104,8 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
 
                 village.remove(JsonFormUtils.VALUE);
                 village.put(JsonFormUtils.VALUE, providerVillage);
+                village.remove(Constants.VILLAGE.HINT);
+                village.put(Constants.VILLAGE.HINT, providerVillage);
 
                 // Inject opensrp id into the form for individual member registration
                 field = fields(form, STEP3); //Changed to step3 for the consent form is now in step2
