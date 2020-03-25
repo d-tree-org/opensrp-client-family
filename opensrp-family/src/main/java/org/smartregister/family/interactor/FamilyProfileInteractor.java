@@ -139,8 +139,16 @@ public class FamilyProfileInteractor implements FamilyProfileContract.Interactor
             JSONObject eventJson = null;
             JSONObject clientJson = null;
 
+            boolean consent = JsonFormUtils.getIndividualConsentValueFromJson(jsonString);
 
             if (baseClient != null) {
+
+                //If consent was not received save client with date removed
+                if (!consent){
+                    Date today = new Date();
+                    baseClient.addAttribute("dateRemoved", today.toString());
+                }
+
                 clientJson = new JSONObject(JsonFormUtils.gson.toJson(baseClient));
                 if (isEditMode) {
                     JsonFormUtils.mergeAndSaveClient(getSyncHelper(), baseClient);

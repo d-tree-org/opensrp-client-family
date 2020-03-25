@@ -114,12 +114,7 @@ public class FamilyRegisterInteractor implements FamilyRegisterContract.Interact
 
         try {
 
-            boolean consent;
-            if (JsonFormUtils.isFamilyMemberRegistration(jsonString)){
-                consent = JsonFormUtils.getIndividualConsentValueFromJson(jsonString);
-            }else {
-                consent = JsonFormUtils.getConsentValueFromJson(jsonString);
-            }
+            boolean consent = JsonFormUtils.getConsentValueFromJson(jsonString);
 
             List<EventClient> eventClientList = new ArrayList<>();
 
