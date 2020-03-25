@@ -558,6 +558,15 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
 
     }
 
+    public static boolean isFamilyMemberRegistration(String jsonString){
+        //TODO : Change implementation
+        String fieldValue = getFieldValue(jsonString, STEP1, "member_consent");
+        if (fieldValue != null){
+            return true;
+        }else {
+            return false;
+        }
+    }
 
     public static boolean getConsentValueFromJson(String jsonString){
 
@@ -569,6 +578,18 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
         }
 
         return familyConsents;
+    }
+
+    public static boolean getIndividualConsentValueFromJson(String jsonString){
+
+        boolean memberConsent = false;
+
+        String fieldValue = getFieldValue(jsonString, STEP1, "member_consent");
+        if (fieldValue != null && fieldValue.contains("chk_consent_yes")){
+            memberConsent = true;
+        }
+
+        return memberConsent;
     }
 
     /**
