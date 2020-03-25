@@ -85,6 +85,11 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
             JSONArray field = fields(form, STEP1);
             JSONObject uniqueId = getFieldJSONObject(field, Constants.JSON_FORM_KEY.UNIQUE_ID);
 
+            if (formName.equals(Utils.metadata().familyMemberRegister.formName)){
+                field = fields(form, STEP2);
+                uniqueId = getFieldJSONObject(field, Constants.JSON_FORM_KEY.UNIQUE_ID);
+            }
+
             JSONObject village = getFieldJSONObject(field, Constants.JSON_FORM_KEY.VILLAGE);
 
             if (formName.equals(Utils.metadata().familyRegister.formName)) {
@@ -93,12 +98,6 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
                     uniqueId.put(JsonFormUtils.VALUE, entityId + "_Family");
                 }
 
-                // Get the provider village here
-                /*
-                1. From SharedPreference
-                2. From the database
-                3. ?
-                 */
                 String username = getAllSharedPreferences().getANMPreferredName(getAllSharedPreferences().fetchRegisteredANM());
                 String providerVillage = getAllSharedPreferences().fetchUserLocalityName(username);
 
