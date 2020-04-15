@@ -144,7 +144,7 @@ public class FamilyProfileInteractor implements FamilyProfileContract.Interactor
             if (baseClient != null) {
 
                 //If consent was not received save client with date removed
-                if (!consent){
+                if (!consent && !isEditMode){
                     Date today = new Date();
                     baseClient.addAttribute("dateRemoved", today.toString());
                 }
