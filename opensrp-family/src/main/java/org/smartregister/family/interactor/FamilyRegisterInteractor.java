@@ -127,7 +127,8 @@ public class FamilyRegisterInteractor implements FamilyRegisterContract.Interact
 
                 if (baseClient != null) {
                     // Check if consent was received, if not set the date removed value
-                    if (!consent){
+                    // And do not check this during editing client information
+                    if (!consent && !isEditMode){
                         Date today = new Date();
                         baseClient.addAttribute("dateRemoved", today.toString());
                     }
