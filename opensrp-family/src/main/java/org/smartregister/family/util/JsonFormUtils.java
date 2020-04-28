@@ -337,7 +337,8 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
 
                 }
 
-                JsonFormUtils.addLocHierarchyQuestions(form);
+                //Removed on because at does not have the location hierarchy
+                //JsonFormUtils.addLocHierarchyQuestions(form);
 
                 return form;
             }
