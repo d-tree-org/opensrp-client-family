@@ -127,7 +127,8 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
                 }
             }
 
-            JsonFormUtils.addLocHierarchyQuestions(form);
+            //Removed in at
+            //JsonFormUtils.addLocHierarchyQuestions(form);
 
         } else {
             Timber.w("Unsupported form requested for launch " + formName);
