@@ -594,6 +594,32 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
         return memberConsent;
     }
 
+    public static JSONObject addConsentToEvent(JSONObject eventJson, boolean consent){
+
+        try {
+            JSONArray array =  eventJson.getJSONArray("obs");
+            JSONObject object = new JSONObject();
+            for (int i=0; i<array.length(); i++){
+                JSONObject obj = array.getJSONObject(i);
+                String fieldCode = obj.getString("fieldCode");
+                if (fieldCode.equals("member_consent")){
+                    object = obj;
+                }
+            }
+
+            if (!consent) {
+                JSONArray hrv = new JSONArray();
+                hrv.put("false");
+                object.put("humanReadableValues", hrv);
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return eventJson;
+    }
+
     /**
      * Loops over all fields that are configured as location fields and injects the default location hierarchy
      *
