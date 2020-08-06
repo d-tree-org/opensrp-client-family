@@ -622,12 +622,14 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
                     object = obj;
                 }
             }
-
+            JSONArray values = new JSONArray();
             if (!consent) {
-                JSONArray hrv = new JSONArray();
-                hrv.put("false");
-                object.put("humanReadableValues", hrv);
+                values.put("false");
+            }else {
+                values.put("true");
             }
+            object.put("humanReadableValues", values);
+            object.put("values", values);
 
         }catch (Exception e){
             e.printStackTrace();

@@ -159,6 +159,7 @@ public class FamilyProfileInteractor implements FamilyProfileContract.Interactor
 
             if (baseEvent != null) {
                 eventJson = new JSONObject(JsonFormUtils.gson.toJson(baseEvent));
+                JsonFormUtils.addConsentToEvent(eventJson, consent);
                 getSyncHelper().addEvent(baseEvent.getBaseEntityId(), eventJson);
             }
 
