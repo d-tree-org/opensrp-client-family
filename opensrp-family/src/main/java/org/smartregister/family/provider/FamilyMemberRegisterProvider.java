@@ -272,6 +272,7 @@ public class FamilyMemberRegisterProvider implements RecyclerViewProvider<Family
         public TextView gender;
         public TextView familyHead;
         public TextView primaryCaregiver;
+        public TextView textViewHasReferral;
         public ImageView nextArrow;
 
         public View statusLayout;
@@ -290,6 +291,7 @@ public class FamilyMemberRegisterProvider implements RecyclerViewProvider<Family
             gender = itemView.findViewById(R.id.gender);
             familyHead = itemView.findViewById(R.id.family_head);
             primaryCaregiver = itemView.findViewById(R.id.primary_caregiver);
+            textViewHasReferral = itemView.findViewById(R.id.has_referral);
             nextArrow = itemView.findViewById(R.id.next_arrow);
 
             statusLayout = itemView.findViewById(R.id.status_layout);

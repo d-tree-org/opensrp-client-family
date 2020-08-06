@@ -219,7 +219,15 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
             Client baseClient = org.smartregister.util.JsonFormUtils.createBaseClient(fields, formTag(allSharedPreferences), entityId);
             baseClient.addRelationship(Utils.metadata().familyMemberRegister.familyRelationKey, familyBaseEntityId);
 
-            Event baseEvent = org.smartregister.util.JsonFormUtils.createEvent(fields, getJSONObject(jsonForm, METADATA), formTag(allSharedPreferences), entityId, Utils.metadata().familyMemberRegister.registerEventType, Utils.metadata().familyMemberRegister.tableName);
+            String encounterType;
+
+            if (isAdolescent(jsonString)) {
+                encounterType = "Adolescent Registration";
+            } else {
+                encounterType = Utils.metadata().familyMemberRegister.registerEventType;
+            }
+
+            Event baseEvent = org.smartregister.util.JsonFormUtils.createEvent(fields, getJSONObject(jsonForm, METADATA), formTag(allSharedPreferences), entityId, encounterType, Utils.metadata().familyMemberRegister.tableName);
 
             JsonFormUtils.tagSyncMetadata(allSharedPreferences, baseEvent);// tag docs
 
@@ -228,6 +236,14 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
             Timber.e(e);
             return null;
         }
+    }
+
+    private static boolean isAdolescent(String jsonString) {
+
+        String age = getFieldValue(jsonString, "age_calculated");
+        Float ageInt = Float.parseFloat(age);
+
+        return (ageInt >= 13 && ageInt <= 19);
     }
 
     public static FamilyEventClient processFamilyUpdateForm(AllSharedPreferences allSharedPreferences, String jsonString, String familyBaseEntityId) {
