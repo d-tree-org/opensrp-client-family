@@ -144,6 +144,7 @@ public class FamilyRegisterInteractor implements FamilyRegisterContract.Interact
 
                 if (baseEvent != null) {
                     eventJson = new JSONObject(JsonFormUtils.gson.toJson(baseEvent));
+                    JsonFormUtils.addConsentToEvent(eventJson, consent);
                     getSyncHelper().addEvent(baseEvent.getBaseEntityId(), eventJson);
                 }
 
