@@ -80,11 +80,11 @@ def githubProperties = new Properties()
 githubProperties.load(new FileInputStream(rootProject.file("github.properties")))
 
 def getVersionName = { ->
-    return "1.2.43-DTREE-3-SNAPSHOT" // Library version
+    return "1.2.43-DTREE-6-SNAPSHOT" // Library version
 }
 
 def getArtificatId = { ->
-    return "opensrp-client-family-"+getVersionName() // Library name
+    return "opensrp-client-family" // Library name
 }
 
 publishing {
@@ -113,7 +113,7 @@ publishing {
             groupId 'org.smartregister' // Library groupID
             artifactId getArtificatId()
             version getVersionName()
-            artifact("$buildDir/outputs/aar/${getArtificatId()}.aar")
+            artifact("$buildDir/outputs/aar/${getArtificatId()}-${getVersionName()}.aar")
 
             //This is to carter for transitive dependencies within this library
             pom.withXml {
