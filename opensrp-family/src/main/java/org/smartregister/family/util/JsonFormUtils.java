@@ -74,7 +74,9 @@ public class JsonFormUtils extends org.smartregister.util.JsonFormUtils {
         String entityId = id;
         form.getJSONObject(METADATA).put(ENCOUNTER_LOCATION, currentLocationId);
 
-        if (Utils.metadata().familyRegister.formName.equals(formName) || Utils.metadata().familyMemberRegister.formName.equals(formName)) {
+        if (Utils.metadata().familyRegister.formName.equals(formName) ||
+                Utils.metadata().familyMemberRegister.formName.equals(formName) ||
+                Constants.JSON_FORM_CONSTANT.ANC_MOTHER_REGISTRATION.equals(formName)) {
             if (StringUtils.isNotBlank(entityId)) {
                 entityId = entityId.replace("-", "");
             }
